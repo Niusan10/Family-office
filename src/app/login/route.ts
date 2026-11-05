@@ -11,17 +11,16 @@ const MESSAGES: Record<string, { cls: string; text: string }> = {
   out: { cls: 'ok', text: 'Has cerrado sesión.' },
 };
 
-/** Login neutro: sin nombre comercial, sin logo, sin JavaScript. */
+/** Login: escudo familiar, formulario mínimo y sin JavaScript. */
 export function GET(req: NextRequest) {
   const m = MESSAGES[req.nextUrl.searchParams.get('e') ?? ''];
   return plainPage({
     nonce: req.headers.get('x-nonce') ?? '',
     title: 'Acceso',
     body: (csrf) => `
-<h1>Acceso</h1>
-<p class="sub">Introduce tus credenciales.</p>
-${m ? `<p class="msg ${m.cls}" role="alert">${esc(m.text)}</p>` : ''}
+<h1 class="eyebrow">Acceso privado</h1>
 <form method="post" action="/api/auth/login" autocomplete="on">
+  ${m ? `<p class="msg ${m.cls}" role="alert">${esc(m.text)}</p>` : ''}
   <input type="hidden" name="csrf" value="${csrf}">
   <label for="email">Email</label>
   <input id="email" name="email" type="email" autocomplete="username" required maxlength="254" autofocus>

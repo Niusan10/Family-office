@@ -11,6 +11,8 @@ const PUBLIC_GET = new Set([
   '/login',
   '/activar',
   '/robots.txt',
+  '/brand/escudo.webp',
+  '/fonts/ubuntu-300.woff2',
   '/fonts/ubuntu-400.woff2',
   '/fonts/ubuntu-500.woff2',
   '/fonts/ubuntu-700.woff2',

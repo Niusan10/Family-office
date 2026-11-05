@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     return plainPage({
       nonce,
       title: 'Acceso',
-      body: () => `<h1>Enlace no válido</h1><p class="sub">Este enlace ha caducado o ya se ha usado. Pide uno nuevo al administrador.</p>`,
+      body: () => `<h1 class="eyebrow">Enlace no válido</h1><p class="note">Este enlace ha caducado o ya se ha usado.<br>Pide uno nuevo al administrador.</p>`,
     });
   }
 
@@ -32,10 +32,10 @@ export async function GET(req: NextRequest) {
     nonce,
     title: 'Acceso',
     body: (csrf) => `
-<h1>Crea tu contraseña</h1>
-<p class="sub">${esc(email)}</p>
-${err ? `<p class="msg err" role="alert">${esc(err)}</p>` : ''}
+<h1 class="eyebrow">Crea tu contraseña</h1>
+<p class="who">${esc(email)}</p>
 <form method="post" action="/api/auth/activate">
+  ${err ? `<p class="msg" role="alert">${esc(err)}</p>` : ''}
   <input type="hidden" name="csrf" value="${csrf}">
   <input type="hidden" name="t" value="${esc(token)}">
   <input type="text" name="username" value="${esc(email)}" autocomplete="username" hidden>

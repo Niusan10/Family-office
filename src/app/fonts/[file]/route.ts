@@ -6,6 +6,7 @@ export const dynamic = 'force-static';
 // Fuentes para las páginas públicas sin JavaScript (login y activación), que no cargan /_next.
 // Lista cerrada: cualquier otro nombre responde 404.
 const FILES: Record<string, string> = {
+  'ubuntu-300.woff2': 'ubuntu-latin-300-normal.woff2',
   'ubuntu-400.woff2': 'ubuntu-latin-400-normal.woff2',
   'ubuntu-500.woff2': 'ubuntu-latin-500-normal.woff2',
   'ubuntu-700.woff2': 'ubuntu-latin-700-normal.woff2',
