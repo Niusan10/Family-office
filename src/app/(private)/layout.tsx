@@ -11,7 +11,8 @@ export default async function PrivateLayout({ children }: { children: ReactNode 
   return (
     <div className="shell">
       <nav className="nav" aria-label="Principal">
-        <div className="brand-bar" aria-hidden="true" />
+        {/* eslint-disable-next-line @next/next/no-img-element -- servido tras la sesión, sin optimizador */}
+        <img className="logo" src="/brand/nodriza-blanco.png" alt="Nodriza Tech" width={1266} height={150} />
         <NavLink href="/dashboard">Inicio</NavLink>
         {user.role === 'admin' && <NavLink href="/admin/usuarios">Emails autorizados</NavLink>}
         <div className="spacer" />
