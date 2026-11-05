@@ -17,6 +17,7 @@ export type User = {
 const userKey = (email: string) => `user/${sha256(email)}`;
 const inviteKey = (hash: string) => `invite/${hash}`;
 const INVITE_TTL = 72 * 3600;
+const setupUsedKey = (token: string) => `setup-used/${sha256(token)}`;
 
 export const normalizeEmail = (e: string) => e.trim().toLowerCase();
 
@@ -73,8 +74,11 @@ export async function peekInvite(token: string): Promise<string | null> {
   if (!token || token.length > 200) return null;
   const env = requireEnv();
   if (safeEqual(token, env.SETUP_TOKEN)) {
+    // Token de arranque / recuperación del administrador: sirve UNA vez por valor.
+    // Para generar otro, se cambia SETUP_TOKEN en Vercel.
+    if (await kvGet(setupUsedKey(token))) return null;
     const admin = await getUser(env.ADMIN_EMAIL);
-    return admin && !admin.passwordHash ? admin.email : null; // el token de arranque solo sirve una vez
+    return admin ? admin.email : null;
   }
   const email = await kvGet<string>(inviteKey(sha256(token)));
   if (!email) return null;
@@ -85,6 +89,7 @@ export async function peekInvite(token: string): Promise<string | null> {
 export async function consumeInvite(token: string): Promise<string | null> {
   const email = await peekInvite(token);
   if (!email) return null;
-  if (!safeEqual(token, requireEnv().SETUP_TOKEN)) await kvDel(inviteKey(sha256(token)));
+  if (safeEqual(token, requireEnv().SETUP_TOKEN)) await kvSet(setupUsedKey(token), Date.now());
+  else await kvDel(inviteKey(sha256(token)));
   return email;
 }
