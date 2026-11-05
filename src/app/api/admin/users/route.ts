@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { readSession, revokeAllForUser, SESSION_COOKIE } from '@/server/auth/session';
 import { verifyCsrfToken } from '@/server/auth/csrf';
 import { addUser, createInvite, getUser, isValidEmail, normalizeEmail, removeUser, type Role } from '@/server/auth/users';
-import { redis } from '@/server/db/redis';
+import { kvSet } from '@/server/db/kv';
 import { requireEnv } from '@/env';
 import { audit } from '@/server/security/audit';
 import { clientIp } from '@/server/security/rate-limit';
@@ -59,6 +59,6 @@ export async function POST(req: NextRequest) {
   }
 
   // El mensaje (y el enlace, si lo hay) se muestra una sola vez y no viaja en la URL.
-  await redis().set(`fo:flash:${session.family}`, flash, { ex: 600 });
+  await kvSet(`flash/${session.family}`, flash, { ttl: 600 });
   return NextResponse.redirect(new URL('/admin/usuarios', req.url), 303);
 }

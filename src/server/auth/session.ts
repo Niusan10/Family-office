@@ -1,7 +1,7 @@
 // Importado también por src/proxy.ts: sin "server-only" (el proxy no se compila en la capa react-server).
 import { createHmac } from 'node:crypto';
 import type { NextResponse } from 'next/server';
-import { redis } from '@/server/db/redis';
+import { kvDel, kvGet, kvKeys, kvSet } from '@/server/db/kv';
 import { randomToken, sha256 } from '@/server/security/crypto';
 import { audit } from '@/server/security/audit';
 
@@ -13,70 +13,76 @@ const IDLE = 30 * 60; //        30 min de inactividad
 const ABSOLUTE = 8 * 3600; //   8 h máximo desde el login
 const ROTATE = 5 * 60; //       rotación del identificador
 const GRACE = 30; //            tolerancia para peticiones paralelas tras rotar
+const TOUCH = 60; //            como mucho una escritura por minuto para renovar la inactividad
 
 export type SessionRecord = {
   email: string;
   family: string;
   createdAt: number;
   rotatedAt: number;
+  lastSeen: number;
   csrfSecret: string;
   uaHash: string;
 };
 
-type RotatedRecord = { rotatedTo: string; graceUntil: number; family: string };
+type RotatedRecord = { rotatedTo: string; graceUntil: number };
 
 const now = () => Math.floor(Date.now() / 1000);
-const sessKey = (hash: string) => `fo:sess:${hash}`;
-const famKey = (family: string) => `fo:fam:${family}`;
-const userSessKey = (email: string) => `fo:usersess:${email}`;
+
+// La cookie es "<familia>.<secreto>". Solo se guarda el hash del secreto: un volcado no da sesiones válidas.
+const parseSid = (sid: string) => {
+  const [family, secret] = sid.split('.');
+  return family && secret && /^[\w-]{16,64}$/.test(family) ? { family, secret } : null;
+};
+const sessKey = (family: string, secretHash: string) => `sess/${family}/${secretHash}`;
+const userSessKey = (email: string, family: string) => `usersess/${sha256(email)}/${family}`;
 
 export async function createSession(email: string, ua: string) {
-  const sid = randomToken(32);
-  const hash = sha256(sid);
+  const family = randomToken(16);
+  const secret = randomToken(32);
   const t = now();
   const record: SessionRecord = {
     email,
-    family: randomToken(16),
+    family,
     createdAt: t,
     rotatedAt: t,
+    lastSeen: t,
     csrfSecret: randomToken(32),
     uaHash: sha256(ua),
   };
-  await redis()
-    .pipeline()
-    .set(sessKey(hash), record, { ex: IDLE })
-    .sadd(famKey(record.family), hash)
-    .expire(famKey(record.family), ABSOLUTE + IDLE)
-    .sadd(userSessKey(email), record.family)
-    .expire(userSessKey(email), ABSOLUTE + IDLE)
-    .exec();
-  return { sid, session: record };
+  await Promise.all([
+    kvSet(sessKey(family, sha256(secret)), record, { ttl: IDLE }),
+    kvSet(userSessKey(email, family), 1, { ttl: ABSOLUTE + IDLE }),
+  ]);
+  return { sid: `${family}.${secret}`, session: record };
 }
 
 export type SessionCheck = { session: SessionRecord; rotatedSid: string | null };
 
 /**
- * Valida la sesión, renueva la inactividad y rota el identificador cada 5 minutos.
- * Un identificador ya rotado que vuelve fuera de la gracia revoca toda la familia.
+ * Valida la sesión, renueva la inactividad y rota el secreto cada 5 minutos.
+ * Un secreto ya rotado que vuelve fuera de la gracia revoca toda la familia.
  */
 export async function validateAndTouchSession(sid: string, ua: string): Promise<SessionCheck | null> {
-  const key = sessKey(sha256(sid));
-  const s = await redis().get<SessionRecord | RotatedRecord>(key);
+  const p = parseSid(sid);
+  if (!p) return null;
+  const key = sessKey(p.family, sha256(p.secret));
+  const s = await kvGet<SessionRecord | RotatedRecord>(key);
   if (!s) return null;
   const t = now();
 
   if ('rotatedTo' in s) {
     if (t <= s.graceUntil) {
-      const current = await redis().get<SessionRecord>(sessKey(s.rotatedTo));
+      const current = await kvGet<SessionRecord>(sessKey(p.family, s.rotatedTo));
       return current ? { session: current, rotatedSid: null } : null;
     }
-    await revokeFamily(s.family);
+    await revokeFamily(p.family);
     await audit({ event: 'session.reuse_detected' });
     return null;
   }
 
   if (t - s.createdAt > ABSOLUTE || s.uaHash !== sha256(ua)) {
-    await revokeFamily(s.family);
+    await revokeFamily(p.family);
     await audit({ event: 'session.invalid', email: s.email, reason: t - s.createdAt > ABSOLUTE ? 'absolute' : 'ua' });
     return null;
   }
@@ -84,44 +90,34 @@ export async function validateAndTouchSession(sid: string, ua: string): Promise<
   if (t - s.rotatedAt > ROTATE) {
     const next = randomToken(32);
     const nextHash = sha256(next);
-    const rotated: RotatedRecord = { rotatedTo: nextHash, graceUntil: t + GRACE, family: s.family };
-    await redis()
-      .pipeline()
-      .set(sessKey(nextHash), { ...s, rotatedAt: t }, { ex: IDLE })
-      .set(key, rotated, { ex: IDLE })
-      .sadd(famKey(s.family), nextHash)
-      .exec();
-    return { session: s, rotatedSid: next };
+    await kvSet(sessKey(p.family, nextHash), { ...s, rotatedAt: t, lastSeen: t }, { ttl: IDLE });
+    await kvSet<RotatedRecord>(key, { rotatedTo: nextHash, graceUntil: t + GRACE }, { ttl: GRACE + 5 });
+    return { session: s, rotatedSid: `${p.family}.${next}` };
   }
 
-  await redis().expire(key, IDLE);
+  if (t - s.lastSeen > TOUCH) await kvSet(key, { ...s, lastSeen: t }, { ttl: IDLE });
   return { session: s, rotatedSid: null };
 }
 
 /** Lectura sin efectos (Server Components y route handlers): sigue una rotación en curso. */
 export async function readSession(sid: string | undefined): Promise<SessionRecord | null> {
-  if (!sid) return null;
-  const s = await redis().get<SessionRecord | RotatedRecord>(sessKey(sha256(sid)));
+  const p = sid ? parseSid(sid) : null;
+  if (!p) return null;
+  const s = await kvGet<SessionRecord | RotatedRecord>(sessKey(p.family, sha256(p.secret)));
   if (!s) return null;
-  if ('rotatedTo' in s) return redis().get<SessionRecord>(sessKey(s.rotatedTo));
+  if ('rotatedTo' in s) return kvGet<SessionRecord>(sessKey(p.family, s.rotatedTo));
   return s;
 }
 
 export async function revokeFamily(family: string): Promise<void> {
-  const r = redis();
-  const hashes = await r.smembers(famKey(family));
-  const p = r.pipeline();
-  for (const h of hashes) p.del(sessKey(h));
-  p.del(famKey(family));
-  await p.exec();
+  await kvDel(...(await kvKeys(`sess/${family}/`)));
 }
 
 /** Cierra todas las sesiones de un usuario (al quitarle el acceso o cambiar su contraseña). */
 export async function revokeAllForUser(email: string): Promise<void> {
-  const r = redis();
-  const families = await r.smembers(userSessKey(email));
-  for (const f of families) await revokeFamily(f);
-  await r.del(userSessKey(email));
+  const markers = await kvKeys(`usersess/${sha256(email)}/`);
+  for (const m of markers) await revokeFamily(m.split('/').at(-1)!);
+  await kvDel(...markers);
 }
 
 export const csrfTokenFor = (s: SessionRecord) =>

@@ -6,8 +6,7 @@ const schema = z.object({
   APP_ORIGIN: z.string().min(1),
   ADMIN_EMAIL: z.string().email().transform((s) => s.trim().toLowerCase()),
   SETUP_TOKEN: z.string().min(32),
-  REDIS_URL: z.string().min(1),
-  REDIS_TOKEN: z.string().min(1),
+  BLOB_TOKEN: z.string().min(1),
 });
 
 export type Env = z.infer<typeof schema>;
@@ -25,8 +24,7 @@ export function getEnv(): Env | null {
     APP_ORIGIN: process.env.APP_ORIGIN,
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,
     SETUP_TOKEN: process.env.SETUP_TOKEN,
-    REDIS_URL: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
-    REDIS_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
+    BLOB_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
   });
   if (!parsed.success) {
     const missing = parsed.error.issues.map((i) => i.path.join('.')).join(', ');

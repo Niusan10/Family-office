@@ -1,14 +1,12 @@
 import 'server-only';
-import { redis } from '@/server/db/redis';
+import { kvDel, kvGet, kvIncr } from '@/server/db/kv';
 import { sha256 } from '@/server/security/crypto';
 
-/** Ventana fija en Redis. Devuelve true si la petición está permitida. Si Redis falla, deniega. */
+/** Ventana fija. Devuelve true si la petición está permitida. Si el almacén falla, deniega. */
 export async function rateLimit(key: string, max: number, windowSec: number): Promise<boolean> {
   try {
     const bucket = Math.floor(Date.now() / 1000 / windowSec);
-    const k = `fo:rl:${key}:${bucket}`;
-    const [count] = await redis().pipeline().incr(k).expire(k, windowSec).exec<[number, number]>();
-    return count <= max;
+    return (await kvIncr(`rl/${sha256(key)}-${bucket}`, windowSec)) <= max;
   } catch {
     return false;
   }
@@ -17,18 +15,12 @@ export async function rateLimit(key: string, max: number, windowSec: number): Pr
 // Bloqueo por fallos: 5 intentos fallidos en 15 min bloquean esa IP y ese email durante 15 min.
 const FAIL_MAX = 5;
 const FAIL_WINDOW = 15 * 60;
-const ipKey = (ip: string) => `fo:fail:ip:${ip}`;
-const emailKey = (email: string) => `fo:fail:em:${sha256(email)}`;
+const ipKey = (ip: string) => `fail/ip-${sha256(ip)}`;
+const emailKey = (email: string) => `fail/em-${sha256(email)}`;
 
 export async function recordLoginFailure(ip: string, email: string): Promise<void> {
   try {
-    await redis()
-      .pipeline()
-      .incr(ipKey(ip))
-      .expire(ipKey(ip), FAIL_WINDOW)
-      .incr(emailKey(email))
-      .expire(emailKey(email), FAIL_WINDOW)
-      .exec();
+    await Promise.all([kvIncr(ipKey(ip), FAIL_WINDOW), kvIncr(emailKey(email), FAIL_WINDOW)]);
   } catch {
     /* noop */
   }
@@ -36,7 +28,7 @@ export async function recordLoginFailure(ip: string, email: string): Promise<voi
 
 export async function isLockedOut(ip: string, email: string): Promise<boolean> {
   try {
-    const [a, b] = await redis().mget<(number | null)[]>(ipKey(ip), emailKey(email));
+    const [a, b] = await Promise.all([kvGet<number>(ipKey(ip)), kvGet<number>(emailKey(email))]);
     return (a ?? 0) >= FAIL_MAX || (b ?? 0) >= FAIL_MAX;
   } catch {
     return true;
@@ -44,11 +36,7 @@ export async function isLockedOut(ip: string, email: string): Promise<boolean> {
 }
 
 export async function clearLoginFailures(ip: string, email: string): Promise<void> {
-  try {
-    await redis().del(ipKey(ip), emailKey(email));
-  } catch {
-    /* noop */
-  }
+  await kvDel(ipKey(ip), emailKey(email)).catch(() => undefined);
 }
 
 export function clientIp(req: Request): string {

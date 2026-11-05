@@ -1,7 +1,7 @@
 import { requireAdmin } from '@/server/auth/require-session';
 import { csrfTokenFor } from '@/server/auth/session';
 import { listUsers } from '@/server/auth/users';
-import { redis } from '@/server/db/redis';
+import { kvDel, kvGet } from '@/server/db/kv';
 import type { Flash } from '@/server/ui/flash';
 
 export const dynamic = 'force-dynamic';
@@ -12,7 +12,8 @@ export default async function UsuariosPage() {
   const { session, user: me } = await requireAdmin();
   const csrf = csrfTokenFor(session);
   const users = await listUsers();
-  const flash = await redis().getdel<Flash>(`fo:flash:${session.family}`);
+  const flash = await kvGet<Flash>(`flash/${session.family}`);
+  if (flash) await kvDel(`flash/${session.family}`);
 
   return (
     <>

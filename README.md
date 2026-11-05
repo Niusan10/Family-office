@@ -19,8 +19,8 @@ Prioridades: privilegio mínimo y que nadie pueda encontrarla. Un visitante anó
 | Sesión | `src/server/auth/session.ts` | ID opaco en `__Host-fo_sid` (HttpOnly, Secure, Strict). 30 min de inactividad, 8 h máximas, rotación cada 5 min con detección de reutilización |
 | CSRF | `src/server/auth/csrf.ts` | `SameSite=Strict` + `Origin` + token HMAC ligado a la sesión en cada formulario |
 | 2ª barrera | `src/server/auth/require-session.ts` | Cada página privada vuelve a validar sesión y que el usuario siga autorizado |
-| Auditoría | `src/server/security/audit.ts` | Logins, fallos, altas y bajas en los logs y en Redis |
+| Auditoría | `src/server/security/audit.ts` | Logins, fallos, altas y bajas en los logs y en el almacén privado |
 
 ## Variables de entorno
 
-Ver `.env.example`. Redis se añade desde Vercel → Storage → Upstash Redis (región UE).
+Ver `.env.example`. Los datos (usuarios, sesiones, auditoría) se guardan en un store **Vercel Blob privado** (`fo-data`, región fra1): ningún fichero es accesible sin el token del proyecto.

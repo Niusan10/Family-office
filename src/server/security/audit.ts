@@ -1,5 +1,6 @@
 // Importado también por src/proxy.ts: sin "server-only" (el proxy no se compila en la capa react-server).
-import { redis } from '@/server/db/redis';
+import { kvSet } from '@/server/db/kv';
+import { randomToken } from '@/server/security/crypto';
 
 export type AuditEvent = {
   event:
@@ -20,14 +21,14 @@ export type AuditEvent = {
 };
 
 /**
- * Log de auditoría append-only: va a los logs de Vercel y a una lista en Redis
- * (últimos 10 000 eventos). Nunca registra contraseñas, tokens ni identificadores de sesión.
+ * Log de auditoría append-only: va a los logs de Vercel y al almacén privado
+ * (un fichero por evento en el almacén privado). Nunca registra contraseñas, tokens ni identificadores de sesión.
  */
 export async function audit(e: AuditEvent): Promise<void> {
   const entry = { ts: new Date().toISOString(), ...e };
   console.log(JSON.stringify({ audit: entry }));
   try {
-    await redis().pipeline().lpush('fo:audit', JSON.stringify(entry)).ltrim('fo:audit', 0, 9999).exec();
+    await kvSet(`audit/${Date.now()}-${randomToken(6)}`, entry);
   } catch {
     // Un fallo de auditoría no debe abrir nada: el evento ya está en los logs.
   }
