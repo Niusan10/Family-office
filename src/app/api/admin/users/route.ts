@@ -59,6 +59,6 @@ export async function POST(req: NextRequest) {
   }
 
   // El mensaje (y el enlace, si lo hay) se muestra una sola vez y no viaja en la URL.
-  await redis().set(`flash:${session.family}`, flash, { ex: 600 });
+  await redis().set(`fo:flash:${session.family}`, flash, { ex: 600 });
   return NextResponse.redirect(new URL('/admin/usuarios', req.url), 303);
 }

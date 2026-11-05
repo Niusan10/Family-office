@@ -27,7 +27,7 @@ export async function audit(e: AuditEvent): Promise<void> {
   const entry = { ts: new Date().toISOString(), ...e };
   console.log(JSON.stringify({ audit: entry }));
   try {
-    await redis().pipeline().lpush('audit', JSON.stringify(entry)).ltrim('audit', 0, 9999).exec();
+    await redis().pipeline().lpush('fo:audit', JSON.stringify(entry)).ltrim('fo:audit', 0, 9999).exec();
   } catch {
     // Un fallo de auditoría no debe abrir nada: el evento ya está en los logs.
   }

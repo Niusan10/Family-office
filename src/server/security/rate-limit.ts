@@ -6,7 +6,7 @@ import { sha256 } from '@/server/security/crypto';
 export async function rateLimit(key: string, max: number, windowSec: number): Promise<boolean> {
   try {
     const bucket = Math.floor(Date.now() / 1000 / windowSec);
-    const k = `rl:${key}:${bucket}`;
+    const k = `fo:rl:${key}:${bucket}`;
     const [count] = await redis().pipeline().incr(k).expire(k, windowSec).exec<[number, number]>();
     return count <= max;
   } catch {
@@ -17,8 +17,8 @@ export async function rateLimit(key: string, max: number, windowSec: number): Pr
 // Bloqueo por fallos: 5 intentos fallidos en 15 min bloquean esa IP y ese email durante 15 min.
 const FAIL_MAX = 5;
 const FAIL_WINDOW = 15 * 60;
-const ipKey = (ip: string) => `fail:ip:${ip}`;
-const emailKey = (email: string) => `fail:em:${sha256(email)}`;
+const ipKey = (ip: string) => `fo:fail:ip:${ip}`;
+const emailKey = (email: string) => `fo:fail:em:${sha256(email)}`;
 
 export async function recordLoginFailure(ip: string, email: string): Promise<void> {
   try {

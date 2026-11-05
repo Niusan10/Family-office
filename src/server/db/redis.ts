@@ -2,6 +2,7 @@
 import { Redis } from '@upstash/redis';
 import { requireEnv } from '@/env';
 
+// Base de datos compartida con otros proyectos: TODAS las claves de esta app empiezan por "fo:".
 let client: Redis | null = null;
 
 export function redis(): Redis {

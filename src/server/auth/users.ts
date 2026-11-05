@@ -14,9 +14,9 @@ export type User = {
   passwordSetAt: number | null;
 };
 
-const userKey = (email: string) => `user:${email}`;
-const USERS = 'users';
-const inviteKey = (hash: string) => `invite:${hash}`;
+const userKey = (email: string) => `fo:user:${email}`;
+const USERS = 'fo:users';
+const inviteKey = (hash: string) => `fo:invite:${hash}`;
 const INVITE_TTL = 72 * 3600;
 
 export const normalizeEmail = (e: string) => e.trim().toLowerCase();

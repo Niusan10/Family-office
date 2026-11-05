@@ -12,7 +12,7 @@ export default async function UsuariosPage() {
   const { session, user: me } = await requireAdmin();
   const csrf = csrfTokenFor(session);
   const users = await listUsers();
-  const flash = await redis().getdel<Flash>(`flash:${session.family}`);
+  const flash = await redis().getdel<Flash>(`fo:flash:${session.family}`);
 
   return (
     <>

@@ -26,9 +26,9 @@ export type SessionRecord = {
 type RotatedRecord = { rotatedTo: string; graceUntil: number; family: string };
 
 const now = () => Math.floor(Date.now() / 1000);
-const sessKey = (hash: string) => `sess:${hash}`;
-const famKey = (family: string) => `fam:${family}`;
-const userSessKey = (email: string) => `usersess:${email}`;
+const sessKey = (hash: string) => `fo:sess:${hash}`;
+const famKey = (family: string) => `fo:fam:${family}`;
+const userSessKey = (email: string) => `fo:usersess:${email}`;
 
 export async function createSession(email: string, ua: string) {
   const sid = randomToken(32);
