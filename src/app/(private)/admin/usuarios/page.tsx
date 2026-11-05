@@ -54,16 +54,16 @@ export default async function UsuariosPage() {
         <tbody>
           {users.map((u) => (
             <tr key={u.email}>
-              <td>{u.email}</td>
-              <td>{u.role === 'admin' ? 'Administrador' : 'Miembro'}</td>
-              <td>
+              <td className="email">{u.email}</td>
+              <td data-label="Rol">{u.role === 'admin' ? 'Administrador' : 'Miembro'}</td>
+              <td data-label="Estado">
                 {u.passwordHash ? (
                   <span className="badge ok">Activo</span>
                 ) : (
                   <span className="badge pending">Pendiente de crear contraseña</span>
                 )}
               </td>
-              <td>{fmt(u.createdAt)}</td>
+              <td data-label="Alta">{fmt(u.createdAt)}</td>
               <td className="actions">
                 <form method="post" action="/api/admin/users">
                   <input type="hidden" name="csrf" value={csrf} />

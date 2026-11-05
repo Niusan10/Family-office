@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { requireSession } from '@/server/auth/require-session';
 import { csrfTokenFor } from '@/server/auth/session';
 import { NavLink } from '@/components/nav-link';
+import { NavShell } from '@/components/nav-shell';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,9 +11,12 @@ export default async function PrivateLayout({ children }: { children: ReactNode 
 
   return (
     <div className="shell">
-      <nav className="nav" aria-label="Principal">
-        {/* eslint-disable-next-line @next/next/no-img-element -- servido tras la sesión, sin optimizador */}
-        <img className="logo" src="/brand/nodriza-blanco.png" alt="Nodriza Tech" width={1266} height={150} />
+      <NavShell
+        logo={
+          // eslint-disable-next-line @next/next/no-img-element -- servido tras la sesión, sin optimizador
+          <img className="logo" src="/brand/nodriza-blanco.png" alt="Nodriza Tech" width={1266} height={150} />
+        }
+      >
         <NavLink href="/dashboard">Inicio</NavLink>
         {user.role === 'admin' && <NavLink href="/admin/usuarios">Emails autorizados</NavLink>}
         <div className="spacer" />
@@ -21,7 +25,7 @@ export default async function PrivateLayout({ children }: { children: ReactNode 
           <input type="hidden" name="csrf" value={csrfTokenFor(session)} />
           <button type="submit" className="logout">Cerrar sesión</button>
         </form>
-      </nav>
+      </NavShell>
       <main className="main">{children}</main>
     </div>
   );
