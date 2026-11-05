@@ -24,6 +24,9 @@ export function plainPage(opts: { nonce: string; title: string; body: (csrf: str
 <meta name="color-scheme" content="dark">
 <title>${esc(opts.title)}</title>
 <link rel="preload" href="/brand/escudo.webp" as="image" type="image/webp">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/brand/icon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
 <style nonce="${esc(opts.nonce)}">
   @font-face { font-family: 'Ubuntu'; font-weight: 300; font-display: swap; src: url('/fonts/ubuntu-300.woff2') format('woff2'); }
   @font-face { font-family: 'Ubuntu'; font-weight: 400; font-display: swap; src: url('/fonts/ubuntu-400.woff2') format('woff2'); }

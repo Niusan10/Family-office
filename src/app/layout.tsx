@@ -10,7 +10,15 @@ export const metadata: Metadata = {
   title: 'Panel',
   robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
   referrer: 'no-referrer',
-  // Sin description, openGraph, twitter, icons ni manifest: nada que indexar ni previsualizar.
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/brand/icon-32.png', type: 'image/png', sizes: '32x32' },
+      { url: '/brand/icon-192.png', type: 'image/png', sizes: '192x192' },
+    ],
+    apple: '/brand/apple-touch-icon.png',
+  },
+  // Sin description, openGraph, twitter ni manifest: nada que indexar ni previsualizar.
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
