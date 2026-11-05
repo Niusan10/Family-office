@@ -69,7 +69,7 @@ function unauthenticated(req: NextRequest, nonce: string, hadCookie: boolean) {
     req.headers.get('sec-fetch-mode') === 'navigate' &&
     !req.nextUrl.pathname.startsWith('/api/');
   const res = isNavigation
-    ? new NextResponse(null, { status: 303, headers: { Location: '/login' } })
+    ? NextResponse.redirect(new URL('/login', req.url), 303) // URL absoluta: Next.js rechaza Location relativo en el proxy
     : empty(401);
   if (hadCookie) clearCookie(res, SESSION_COOKIE);
   return seal(res, nonce);
