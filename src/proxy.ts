@@ -25,7 +25,7 @@ export async function proxy(req: NextRequest) {
 
   // 2. Cualquier petición que modifica algo debe venir de nuestro propio origen
   const isSafe = SAFE_METHODS.has(req.method);
-  if (!isSafe && req.headers.get('origin') !== env.APP_ORIGIN) return seal(empty(403), nonce);
+  if (!isSafe && !isSameOrigin(req, env.APP_ORIGIN)) return seal(empty(403), nonce);
 
   // 3. Rutas públicas
   if (isSafe && PUBLIC_GET.has(pathname)) return next(req, nonce);
@@ -64,6 +64,17 @@ function unauthenticated(req: NextRequest, nonce: string, hadCookie: boolean) {
     : empty(401);
   if (hadCookie) clearCookie(res, SESSION_COOKIE);
   return seal(res, nonce);
+}
+
+/**
+ * Con Referrer-Policy: no-referrer, los navegadores envían "Origin: null" en los formularios POST.
+ * En ese caso se usa Sec-Fetch-Site, que el navegador fija y una página ajena no puede falsificar.
+ */
+function isSameOrigin(req: NextRequest, appOrigin: string): boolean {
+  const origin = req.headers.get('origin');
+  if (origin === appOrigin) return true;
+  if (origin && origin !== 'null') return false;
+  return req.headers.get('sec-fetch-site') === 'same-origin';
 }
 
 const empty = (status: number) => new NextResponse(null, { status });
