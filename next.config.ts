@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
   reactStrictMode: true,
+  // El route handler /fonts lee estos ficheros en tiempo de ejecución
+  outputFileTracingIncludes: {
+    '/fonts/[file]': ['./node_modules/@fontsource/ubuntu/files/ubuntu-latin-*-normal.woff2'],
+  },
   async headers() {
     return [{ source: '/:path*', headers: fallbackHeaders }];
   },

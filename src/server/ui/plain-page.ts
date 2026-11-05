@@ -22,20 +22,25 @@ export function plainPage(opts: { nonce: string; title: string; body: (csrf: str
 <meta name="referrer" content="no-referrer">
 <title>${esc(opts.title)}</title>
 <style nonce="${esc(opts.nonce)}">
-  :root { color-scheme: light dark; --line: color-mix(in srgb, CanvasText 16%, transparent); }
+  @font-face { font-family: 'Ubuntu'; font-weight: 400; font-display: swap; src: url('/fonts/ubuntu-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Ubuntu'; font-weight: 500; font-display: swap; src: url('/fonts/ubuntu-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Ubuntu'; font-weight: 700; font-display: swap; src: url('/fonts/ubuntu-700.woff2') format('woff2'); }
+  :root { color-scheme: light; --primary: #e81e76; --primary-2: #ff1779; --gray-dark: #424242; --gray-light: #f2f2f2; }
   * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; background: Canvas; color: CanvasText; }
-  main { width: min(380px, 92vw); padding: 32px; border: 1px solid var(--line); border-radius: 14px; }
-  h1 { font-size: 20px; font-weight: 600; margin: 0 0 6px; }
-  p.sub { margin: 0 0 22px; opacity: .7; font-size: 14px; }
-  label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
-  input { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: inherit; }
-  input:focus { outline: 2px solid Highlight; outline-offset: 1px; }
-  button { width: 100%; margin-top: 22px; font: inherit; font-weight: 600; padding: 11px 16px; border: 0; border-radius: 8px; background: CanvasText; color: Canvas; cursor: pointer; }
-  .msg { margin: 0 0 6px; padding: 10px 12px; border-radius: 8px; font-size: 14px; }
-  .err { background: color-mix(in srgb, #d33 14%, transparent); }
-  .ok { background: color-mix(in srgb, #2a2 14%, transparent); }
-  .hint { font-size: 12px; opacity: .65; margin-top: 6px; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; font: 15px/1.55 'Ubuntu', system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--gray-light); color: #000; -webkit-font-smoothing: antialiased; }
+  main { width: min(400px, 92vw); padding: 36px 32px 32px; background: #fff; border-radius: 14px; border-top: 4px solid var(--primary); box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06); }
+  h1 { font-size: 22px; font-weight: 700; margin: 0 0 6px; }
+  p.sub { margin: 0 0 22px; color: var(--gray-dark); font-size: 14px; }
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-dark); margin: 16px 0 6px; }
+  input { width: 100%; font: inherit; padding: 11px 12px; border: 1px solid #d6d6d6; border-radius: 8px; background: #fff; color: #000; }
+  input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(232,30,118,.18); }
+  button { width: 100%; margin-top: 24px; font: inherit; font-weight: 700; padding: 12px 16px; border: 0; border-radius: 8px; background: var(--primary); color: #fff; cursor: pointer; }
+  button:hover { background: var(--primary-2); }
+  button:focus-visible { outline: 2px solid var(--gray-dark); outline-offset: 2px; }
+  .msg { margin: 0 0 8px; padding: 10px 12px; border-radius: 8px; font-size: 14px; background: var(--gray-light); }
+  .err { border-left: 4px solid var(--primary); }
+  .ok { border-left: 4px solid #16a34a; }
+  .hint { font-size: 12px; color: var(--gray-dark); opacity: .8; margin-top: 6px; }
 </style>
 </head>
 <body>

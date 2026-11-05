@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+// Ubuntu autoalojada (paquete @fontsource): sin peticiones a Google Fonts.
+import '@fontsource/ubuntu/400.css';
+import '@fontsource/ubuntu/500.css';
+import '@fontsource/ubuntu/700.css';
 import './globals.css';
 
 export const metadata: Metadata = {

@@ -56,7 +56,13 @@ export default async function UsuariosPage() {
             <tr key={u.email}>
               <td>{u.email}</td>
               <td>{u.role === 'admin' ? 'Administrador' : 'Miembro'}</td>
-              <td>{u.passwordHash ? 'Activo' : <span className="pending">Pendiente de crear contraseña</span>}</td>
+              <td>
+                {u.passwordHash ? (
+                  <span className="badge ok">Activo</span>
+                ) : (
+                  <span className="badge pending">Pendiente de crear contraseña</span>
+                )}
+              </td>
               <td>{fmt(u.createdAt)}</td>
               <td className="actions">
                 <form method="post" action="/api/admin/users">

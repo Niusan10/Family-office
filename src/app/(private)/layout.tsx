@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { requireSession } from '@/server/auth/require-session';
 import { csrfTokenFor } from '@/server/auth/session';
+import { NavLink } from '@/components/nav-link';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,8 +11,9 @@ export default async function PrivateLayout({ children }: { children: ReactNode 
   return (
     <div className="shell">
       <nav className="nav" aria-label="Principal">
-        <Link href="/dashboard">Inicio</Link>
-        {user.role === 'admin' && <Link href="/admin/usuarios">Emails autorizados</Link>}
+        <div className="brand-bar" aria-hidden="true" />
+        <NavLink href="/dashboard">Inicio</NavLink>
+        {user.role === 'admin' && <NavLink href="/admin/usuarios">Emails autorizados</NavLink>}
         <div className="spacer" />
         <div className="who">{user.email}</div>
         <form method="post" action="/api/auth/logout">

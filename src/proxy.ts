@@ -7,7 +7,14 @@ import { getEnv } from '@/env';
  * Guardián único. Deniega por defecto: solo estas rutas exactas son públicas.
  * Todo lo demás (incluidos /_next/static, imágenes y favicon) exige una sesión válida.
  */
-const PUBLIC_GET = new Set(['/login', '/activar', '/robots.txt']);
+const PUBLIC_GET = new Set([
+  '/login',
+  '/activar',
+  '/robots.txt',
+  '/fonts/ubuntu-400.woff2',
+  '/fonts/ubuntu-500.woff2',
+  '/fonts/ubuntu-700.woff2',
+]);
 const PUBLIC_POST = new Set(['/api/auth/login', '/api/auth/activate']);
 const SAFE_METHODS = new Set(['GET', 'HEAD']);
 const INTERNAL_HEADERS = ['x-nonce', 'x-middleware-subrequest'];
