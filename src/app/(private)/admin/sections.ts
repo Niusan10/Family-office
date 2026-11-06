@@ -8,4 +8,9 @@ export const ADMIN_SECTIONS = [
     title: 'Emails autorizados',
     text: 'Quién puede entrar: autorizar emails, enviar enlaces de acceso y quitar permisos.',
   },
+  {
+    href: '/admin/valoraciones',
+    title: 'Valoraciones',
+    text: 'Equity value y enterprise value de cada empresa del holding. Alimentan las gráficas de Inicio.',
+  },
 ] as const;
