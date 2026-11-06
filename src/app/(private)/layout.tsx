@@ -18,7 +18,7 @@ export default async function PrivateLayout({ children }: { children: ReactNode 
         }
       >
         <NavLink href="/dashboard">Inicio</NavLink>
-        {user.role === 'admin' && <NavLink href="/admin/usuarios">Emails autorizados</NavLink>}
+        {user.role === 'admin' && <NavLink href="/admin">Admin</NavLink>}
         <div className="spacer" />
         <div className="who">{user.email}</div>
         <form method="post" action="/api/auth/logout">

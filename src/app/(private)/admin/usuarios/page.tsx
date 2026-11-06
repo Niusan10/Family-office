@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 const fmt = (ms: number) => new Date(ms).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 
 export default async function UsuariosPage() {
-  const { session, user: me } = await requireAdmin();
+  const { session, user: me } = await requireAdmin(); // también lo exige admin/layout.tsx
   const csrf = csrfTokenFor(session);
   const users = await listUsers();
   const flash = await kvGet<Flash>(`flash/${session.family}`);
