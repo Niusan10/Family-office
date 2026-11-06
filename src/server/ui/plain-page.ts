@@ -34,8 +34,9 @@ export function plainPage(opts: { nonce: string; title: string; body: (csrf: str
   @font-face { font-family: 'Ubuntu'; font-weight: 700; font-display: swap; src: url('/fonts/ubuntu-700.woff2') format('woff2'); }
 
   :root {
-    --primary: #e81e76; --primary-2: #ff1779; --gray-dark: #424242; --gray-light: #f2f2f2;
+    /* Login en la gama del escudo (madera y bronce). Dentro de la app se usan los colores corporativos. */
     --ink: #0c0a09; --bronze: #b58456; --bronze-soft: rgba(181, 132, 86, .35);
+    --gold-1: #dcb88a; --gold-2: #b0814f; --gold-3: #8a5c33; --oak-ink: #1a120b; --ember: #c9744a;
     --text: rgba(255, 255, 255, .92); --muted: rgba(255, 255, 255, .55); --line: rgba(255, 255, 255, .16);
   }
   * { box-sizing: border-box; }
@@ -45,7 +46,7 @@ export function plainPage(opts: { nonce: string; title: string; body: (csrf: str
     font: 15px/1.55 'Ubuntu', system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--text);
     background:
       radial-gradient(ellipse 60% 45% at 50% 28%, rgba(181, 132, 86, .20), transparent 70%),
-      radial-gradient(ellipse 80% 60% at 50% 110%, rgba(232, 30, 118, .07), transparent 70%),
+      radial-gradient(ellipse 80% 60% at 50% 110%, rgba(138, 92, 51, .14), transparent 70%),
       var(--ink);
     -webkit-font-smoothing: antialiased;
   }
@@ -73,18 +74,21 @@ export function plainPage(opts: { nonce: string; title: string; body: (csrf: str
     transition: border-color .2s, box-shadow .2s, background .2s;
   }
   input:hover { border-color: rgba(255, 255, 255, .28); }
-  input:focus { outline: none; border-color: var(--primary); background: rgba(255, 255, 255, .06); box-shadow: 0 0 0 4px rgba(232, 30, 118, .18); }
-  input:-webkit-autofill { -webkit-text-fill-color: #fff; -webkit-box-shadow: 0 0 0 1000px #1a1614 inset; caret-color: #fff; }
+  input:focus { outline: none; border-color: var(--bronze); background: rgba(255, 255, 255, .06); box-shadow: 0 0 0 4px rgba(181, 132, 86, .22); }
+  input:-webkit-autofill { -webkit-text-fill-color: #fff; -webkit-box-shadow: 0 0 0 1000px #1a1614 inset; caret-color: var(--gold-1); }
+  input { caret-color: var(--gold-1); }
   button {
     width: 100%; margin-top: 28px; font: inherit; font-size: 13px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase;
-    padding: 15px 16px; border: 0; border-radius: 10px; background: var(--primary); color: #fff; cursor: pointer;
-    box-shadow: 0 10px 30px rgba(232, 30, 118, .28); transition: background .2s, transform .2s, box-shadow .2s;
+    padding: 15px 16px; border: 1px solid rgba(255, 236, 205, .25); border-radius: 10px; cursor: pointer; color: var(--oak-ink);
+    background: linear-gradient(180deg, var(--gold-1) 0%, var(--gold-2) 100%);
+    box-shadow: 0 10px 30px rgba(138, 92, 51, .35), inset 0 1px 0 rgba(255, 244, 225, .45);
+    transition: filter .2s, transform .2s, box-shadow .2s;
   }
-  button:hover { background: var(--primary-2); transform: translateY(-1px); box-shadow: 0 14px 34px rgba(255, 23, 121, .34); }
+  button:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 14px 34px rgba(181, 132, 86, .4), inset 0 1px 0 rgba(255, 244, 225, .5); }
   button:active { transform: translateY(0); }
-  button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  button:focus-visible { outline: 2px solid var(--gold-1); outline-offset: 3px; }
 
-  .msg { margin: 0 0 6px; padding: 11px 14px; border-radius: 10px; font-size: 14px; background: rgba(255, 255, 255, .05); border-left: 3px solid var(--primary); text-align: left; }
+  .msg { margin: 0 0 6px; padding: 11px 14px; border-radius: 10px; font-size: 14px; background: rgba(255, 255, 255, .05); border-left: 3px solid var(--ember); text-align: left; }
   .msg.ok { border-left-color: var(--bronze); }
   .hint { font-size: 12px; color: var(--muted); font-weight: 300; margin-top: 8px; }
   .note { text-align: center; color: var(--muted); font-weight: 300; }
