@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 const fecha = (iso: string) =>
   new Date(`${iso}T12:00:00Z`).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
 
-/** Inicio: el "super dashboard" con lo importante del family office de un vistazo. */
+/** Dashboard: página de inicio tras el login, el "super dashboard" con lo importante del family office de un vistazo. */
 export default async function Dashboard() {
   const { user } = await requireSession();
   const valuations = await getValuations();
@@ -45,7 +45,7 @@ export default async function Dashboard() {
 
   return (
     <>
-      <h1>Inicio</h1>
+      <h1>Dashboard</h1>
       <p className="lead">
         Vacas lecheras del holding
         {valuations?.asOf ? ` · valoración a ${fecha(valuations.asOf)}` : ''}

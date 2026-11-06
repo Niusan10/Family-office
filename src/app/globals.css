@@ -162,7 +162,7 @@ table.users tr:last-child td { border-bottom: 0; }
 .card p { margin: 0; color: var(--muted); font-size: 14px; }
 .card-stat { margin-top: 10px; font-size: 13px; font-weight: 500; color: var(--primary); }
 
-/* ───── Dashboard (Inicio) ───── */
+/* ───── Dashboard (página de inicio) ───── */
 .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 24px; }
 .dash-grid .panel { margin-bottom: 0; }
 .chart-panel h2 { margin-bottom: 4px; }

@@ -17,7 +17,7 @@ export default async function PrivateLayout({ children }: { children: ReactNode 
           <img className="logo" src="/brand/nodriza-blanco.png" alt="Nodriza Tech" width={1266} height={150} />
         }
       >
-        <NavLink href="/dashboard">Inicio</NavLink>
+        <NavLink href="/dashboard">Dashboard</NavLink>
         <div className="spacer" />
         {user.role === 'admin' && (
           <NavLink href="/admin" className="nav-admin">

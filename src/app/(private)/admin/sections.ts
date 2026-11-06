@@ -11,6 +11,6 @@ export const ADMIN_SECTIONS = [
   {
     href: '/admin/valoraciones',
     title: 'Valoraciones',
-    text: 'Equity value y enterprise value de cada empresa del holding. Alimentan las gráficas de Inicio.',
+    text: 'Equity value y enterprise value de cada empresa del holding. Alimentan las gráficas del Dashboard.',
   },
 ] as const;

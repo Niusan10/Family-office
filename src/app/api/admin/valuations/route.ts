@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   } else {
     await saveValuations({ bySlug, asOf, updatedBy: actor.email });
     await audit({ event: 'valuation.updated', by: actor.email, ip: clientIp(req), reason: asOf });
-    flash = { kind: 'ok', text: 'Valoraciones guardadas. Ya se ven en Inicio.' };
+    flash = { kind: 'ok', text: 'Valoraciones guardadas. Ya se ven en el Dashboard.' };
   }
 
   await kvSet(`flash/${session.family}`, flash, { ttl: 600 });

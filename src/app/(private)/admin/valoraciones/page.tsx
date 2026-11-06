@@ -21,7 +21,7 @@ export default async function ValoracionesPage() {
     <>
       <h1>Valoraciones</h1>
       <p className="lead">
-        Equity value y enterprise value de cada empresa, en euros. Alimentan las gráficas de Inicio. Más adelante se
+        Equity value y enterprise value de cada empresa, en euros. Alimentan las gráficas del Dashboard. Más adelante se
         calcularán solos con los cierres mensuales.
       </p>
 
