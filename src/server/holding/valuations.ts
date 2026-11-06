@@ -22,16 +22,16 @@ export type Valuations = {
   updatedBy: string;
 };
 
-const KEY = 'holding/valuations';
+const VALUATIONS_DOC = 'holding/valuations';
 
 export async function getValuations(): Promise<Valuations | null> {
-  return kvGet<Valuations>(KEY);
+  return kvGet<Valuations>(VALUATIONS_DOC);
 }
 
 export async function saveValuations(v: Omit<Valuations, 'updatedAt' | 'source'>): Promise<void> {
   const known = new Set(COMPANIES.map((c) => c.slug));
   const bySlug = Object.fromEntries(Object.entries(v.bySlug).filter(([slug]) => known.has(slug)));
-  await kvSet<Valuations>(KEY, { ...v, bySlug, source: 'manual', updatedAt: Date.now() });
+  await kvSet<Valuations>(VALUATIONS_DOC, { ...v, bySlug, source: 'manual', updatedAt: Date.now() });
 }
 
 /**
