@@ -67,6 +67,10 @@ a { color: inherit; }
 .nav a[aria-current='page'] { color: var(--white); background: rgba(255, 255, 255, 0.1); border-left-color: var(--primary); }
 
 .nav .spacer { flex: 1; }
+.nav a.nav-admin { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.nav a.nav-admin .icon { flex: none; opacity: 0.85; transition: transform 0.4s ease; }
+.nav a.nav-admin:hover .icon { transform: rotate(60deg); }
+@media (prefers-reduced-motion: reduce) { .nav a.nav-admin:hover .icon { transform: none; } }
 .nav .who { font-size: 13px; color: rgba(255, 255, 255, 0.6); padding: 0 12px 8px; word-break: break-all; }
 
 .main { padding: 40px 48px; max-width: 1120px; }
@@ -185,6 +189,8 @@ table.users tr:last-child td { border-bottom: 0; }
   .nav[data-open='true'] .nav-body { display: flex; }
   .nav a { padding: 13px 14px; font-size: 16px; }
   .nav .spacer { display: none; }
+  .nav a.nav-admin { margin: 6px 0 0; border-top: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0; padding-top: 16px; }
+  .nav a.nav-admin + .who { border-top: 0; margin-top: 0; padding-top: 6px; }
   .nav .who { padding: 14px 14px 4px; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 6px; }
   button.logout { padding: 13px 14px; font-size: 16px; }
 
