@@ -19,6 +19,7 @@ export default async function PrivateLayout({ children }: { children: ReactNode 
       >
         <NavLink href="/dashboard">Dashboard</NavLink>
         <NavLink href="/organigrama">Organigrama</NavLink>
+        <NavLink href="/escrituras">Escrituras</NavLink>
         <div className="spacer" />
         {user.role === 'admin' && (
           <NavLink href="/admin" className="nav-admin">

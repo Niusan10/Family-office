@@ -68,3 +68,27 @@ export async function kvIncr(key: string, ttl: number): Promise<number> {
   await kvSet(key, n, { ttl });
   return n;
 }
+
+/** Ficheros binarios (PDF y trozos) en el mismo almacén privado, fuera del formato clave-valor. */
+export async function rawPut(pathname: string, data: Buffer, contentType = 'application/octet-stream'): Promise<void> {
+  await put(`fo/${pathname}`, data, { ...auth(), allowOverwrite: true, addRandomSuffix: false, contentType });
+}
+
+export async function rawGet(pathname: string): Promise<Buffer | null> {
+  const r = await get(`fo/${pathname}`, { ...auth(), useCache: false });
+  if (!r || r.statusCode !== 200) return null;
+  const stream = (r as unknown as { stream?: ReadableStream }).stream;
+  if (!stream) return null;
+  return Buffer.from(await new Response(stream).arrayBuffer());
+}
+
+/** Borra todo lo que cuelga de un prefijo (claves y ficheros binarios). */
+export async function deletePrefix(prefix: string): Promise<void> {
+  const token = requireEnv().BLOB_TOKEN;
+  let cursor: string | undefined;
+  do {
+    const page = await list({ prefix: `fo/${prefix}`, cursor, limit: 1000, token });
+    if (page.blobs.length) await del(page.blobs.map((b) => b.pathname), { token });
+    cursor = page.hasMore ? page.cursor : undefined;
+  } while (cursor);
+}

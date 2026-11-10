@@ -15,7 +15,10 @@ export type AuditEvent = {
     | 'user.removed'
     | 'user.invite'
     | 'valuation.updated'
-    | 'org.updated';
+    | 'org.updated'
+    | 'escritura.uploaded'
+    | 'escritura.deleted'
+    | 'escritura.question';
   reason?: string;
   email?: string;
   by?: string;
