@@ -14,7 +14,8 @@ export type AuditEvent = {
     | 'user.added'
     | 'user.removed'
     | 'user.invite'
-    | 'valuation.updated';
+    | 'valuation.updated'
+    | 'org.updated';
   reason?: string;
   email?: string;
   by?: string;

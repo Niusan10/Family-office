@@ -13,4 +13,9 @@ export const ADMIN_SECTIONS = [
     title: 'Valoraciones',
     text: 'Equity value y enterprise value de cada empresa del holding. Alimentan las gráficas del Dashboard.',
   },
+  {
+    href: '/admin/organigrama',
+    title: 'Organigrama',
+    text: 'Estructura societaria: de quién depende cada sociedad y con qué porcentaje.',
+  },
 ] as const;
